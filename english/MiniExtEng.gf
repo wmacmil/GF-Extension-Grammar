@@ -26,16 +26,13 @@ lin
   --need a function that takes an ip to an np
 	--need to account for who vs whom
 
-  oper UseP
-    UseIP pn = {
-      s = \\_ => pn.s ;
-      a = Agr Sg Per3
-      } ;
-  mkPN : Str -> PN
-    = \s -> lin PN {s = s} ;
-
-
-  
+--  oper UseP
+--    UseIP pn = {
+--      s = \\_ => pn.s ;
+--      a = Agr Sg Per3
+--      } ;
+--  mkPN : Str -> PN
+--    = \s -> lin PN {s = s} ;
 
 
 
