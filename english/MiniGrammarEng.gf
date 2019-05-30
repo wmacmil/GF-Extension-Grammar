@@ -57,7 +57,8 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     CN = Noun ;
     NP = NounPhrase ;
     --NP = {s : Case => Str ; a : Agreement} ;
-    Pron = {s : Case => Str ; a : Agreement} ;
+    Pron = Pronoun ; 
+    --Pron = {s : Case => Str ; a : Agreement} ;
     Det = {s : Str ; n : Number} ;
     Conj = {s : Str} ;
     Prep = {s : Str} ;
@@ -168,7 +169,7 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
       a = Agr Sg Per3
       } ;
       
-    UsePron p = p ;  -- Pron is worst-case NP  
+    --UsePron p = p ;  -- Pron is worst-case NP  
       
     MassNP cn = {
       s = \\_ => cn.s ! Sg ;
@@ -207,34 +208,59 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     on_Prep = {s = "on"} ;
     with_Prep = {s = "with"} ;
 
-    i_Pron = {
-      s = table {Nom => "I" ; Acc => "me"} ;
-      a = Agr Sg Per1
-      } ;
-    youSg_Pron = {
-      s = \\_ => "you" ;
-      a = Agr Sg Per2
-      } ;
-    he_Pron = {
-      s = table {Nom => "he" ; Acc => "him"} ;
-      a = Agr Sg Per3
-      } ;
-    she_Pron = {
-      s = table {Nom => "she" ; Acc => "her"} ;
-      a = Agr Sg Per3
-      } ;
-    we_Pron = {
-      s = table {Nom => "we" ; Acc => "us"} ;
-      a = Agr Pl Per1
-      } ;
-    youPl_Pron = {
-      s = \\_ => "you" ;
-      a = Agr Pl Per2
-      } ;
-    they_Pron = {
-      s = table {Nom => "they" ; Acc => "them"} ;
-      a = Agr Pl Per2
-      } ;
+	oper Pronoun : Type ;
+	oper Pronoun = {s : Case => Str ; p : Str ; a : Agreement} ;
+
+	oper mkPron : Str ->  Str ->  Str -> Agreement -> Pronoun ;
+	--oper mkPron i me my agr = lin Pronoun {
+	oper mkPron i me my agr = {
+		s = table {Nom => i ; Acc => me} ;
+		p = my ;     -- posessive
+		a = agr 
+		};
+
+	oper prToNP : Pronoun -> NounPhrase = \p -> {s = p.s ; a = p.a } ;  
+
+	lin 
+    UsePron p = {s = p.s ; a = p.a } ;  -- Pron is worst-case NP  
+
+    i_Pron = mkPron "I" "me" "my" (Agr Sg Per1) ;
+    youSg_Pron = mkPron "you" "you" "your" (Agr Sg Per2) ;
+    he_Pron = mkPron "he" "him" "his" (Agr Sg Per3) ;
+    she_Pron = mkPron "she" "her" "her" (Agr Sg Per3) ;
+    we_Pron = mkPron "We" "us" "our" (Agr Pl Per1) ;
+    youPl_Pron = mkPron "you" "you" "your" (Agr Pl Per2) ; 
+    they_Pron = mkPron "they" "them" "their" (Agr Pl Per3) ;
+
+
+--    i_Pron = {
+--      s = table {Nom => "I" ; Acc => "me"} ;
+--      a = Agr Sg Per1
+--      } ;
+--    youSg_Pron = {
+--      s = \\_ => "you" ;
+--      a = Agr Sg Per2
+--      } ;
+--    he_Pron = {
+--      s = table {Nom => "he" ; Acc => "him"} ;
+--      a = Agr Sg Per3
+--      } ;
+--    she_Pron = {
+--      s = table {Nom => "she" ; Acc => "her"} ;
+--      a = Agr Sg Per3
+--      } ;
+--    we_Pron = {
+--      s = table {Nom => "we" ; Acc => "us"} ;
+--      a = Agr Pl Per1
+--      } ;
+--    youPl_Pron = {
+--      s = \\_ => "you" ;
+--      a = Agr Pl Per2
+--      } ;
+--    they_Pron = {
+--      s = table {Nom => "they" ; Acc => "them"} ;
+--      a = Agr Pl Per2
+--      } ;
 
     have_V2 = mkVerb "have" "has" "had" "had" "having" ** {c = []} ;
 
