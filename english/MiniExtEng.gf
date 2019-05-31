@@ -17,8 +17,6 @@ concrete MiniExtEng of MiniExt = MiniLangEng ** open MiniResEng, Prelude in {
 		VV = V ;   -- VP-complement verb,       e.g. "want"
 		VA = V ;   -- AP-complement verb,       e.g. "become"
 
-
-
 	oper complV2 : Verb2 -> VerbPhrase = \v2 -> {
 		verb = verb2gverb v2 ;
 		compl = ""
@@ -28,38 +26,34 @@ lin
 
   SlashV2 np v2 = mkCl np (complV2 v2) ;
 
-	QuestSlash ip clslash = {
-		subj = ip.s ! Acc ++ clslash.subj ;
+    --  ip = "";
+    --  subj = np.s ! Nom ;
+    --  isIR = np.isIR ;
+    --  ag = np.a;
+    --  compl = vp.compl ;
+
+	QuestSlash ipN clslash = {
+		ip = clslash.ip ++ ipN.s ! Acc ;
+		subj = clslash.subj ;
+		isIR = ipN.isIR ;
+		cs = Acc ;
 		compl = clslash.compl ;
 		verb = clslash.verb
 	};
 
-		--verb = \\plain,isPres => case <vp.verb.isAux, plain, isPres, np.a> of {
-	--QuestSlash ip clslash = "" ;
-  --SlashV2 np v2 = {n = np ; v = v2 };
-	--maybe just do a predvp with an empty object
-  --SlashV2 np v2 = {s = np.s ! Nom ++ v2.s !  ; 
-  --Verb : Type = {s : VForm => Str} ;
-  --Verb2 : Type = Verb ** {c : Str} ;
-  --I love that the man with the dog sees himself.
-  --so the slashV2 fcn needs to more or less resemble a clause except it doesn't need righthand side
-  --need a function that takes an ip to an np
-
-	who_IP  = mkPron "who" "whom" "whose" (Agr Sg Per3) ;
-	what_IP  = mkPron "what" "what" "" (Agr Sg Per3) ;
+	who_IP  = mkPron "who" "whom" "whose" (Agr Sg Per3) True ;
+	what_IP  = mkPron "what" "what" "" (Agr Sg Per3) True ;
 
 	QuestVP ip vp = let npip = prToNP ip in ( mkCl npip vp) ;
 
+
+	--subj = ip.s ! Acc ++ clslash.subj ;
+  --I love that the man with the dog sees himself.
+  --so the slashV2 fcn needs to more or less resemble a clause except it doesn't need righthand side
+  --need a function that takes an ip to an np
+	--maybe the fin should just be empty in the case of a who what or that
 	--UsePron p = {s = p.s ; a = p.a } ;  -- Pron is worst-case NP  
 
-
---  oper UsePr
---    UseIP ip = {
---      s = \\_ => ip.s ;
---      a = Agr Sg Per3
---      } ;
---  mkPN : Str -> PN
---    = \s -> lin PN {s = s} ;
 
 --
 --	QuestVP ip vp = "" ;
