@@ -1,27 +1,43 @@
 --# -path=.:../abstract
 concrete MiniExtEng of MiniExt = MiniLangEng ** open MiniResEng, Prelude in {
---concrete MiniExtEng of MiniExt = MiniLangEng ** {
---concrete MiniExtEng of MiniExt = open MiniResEng, Prelude in MiniLangEng ** {
 
-lincat
+	lincat
 
-  --ClSlash = {s : Str}; -- slash clause,          e.g. "(that) I see"
-  ClSlash = {n : NounPhrase ; v : Verb2 }; -- slash clause,          e.g. "(that) I see"
-  --ClSlash = {n : NounPhrase ; v : V2 }; -- slash clause,          e.g. "(that) I see"
-  IAdv = Str ; -- interrogative adverbial,  e.g. "where"
-  RS = Str ;   -- relative clause with fixed tense and polarity, e.g. "that I have not seen"
-  RCl = Str ;  -- relative clause,          e.g. "that I see"
-  RP = Str ;   -- relative pronoun,         e.g. "that"
-  IP = Pronoun ;   -- interrogative pronoun,    e.g. "who"
-  Subj = Str ; -- subjunction,              e.g. "because"
-  VS = V ;   -- sentence-complement verb, e.g. "know"
-  VQ = V ;   -- question-complement verb, e.g. "wonder"
-  VV = V ;   -- VP-complement verb,       e.g. "want"
-  VA = V ;   -- AP-complement verb,       e.g. "become"
+		ClSlash = Clause ;
+		--ClSlash = {n : NounPhrase ; v : Verb2 }; -- slash clause,          e.g. "(that) I see"
+		--ClSlash = {n : NounPhrase ; v : V2 }; -- slash clause,          e.g. "(that) I see"
+		IAdv = Str ; -- interrogative adverbial,  e.g. "where"
+		RS = Str ;   -- relative clause with fixed tense and polarity, e.g. "that I have not seen"
+		RCl = Str ;  -- relative clause,          e.g. "that I see"
+		RP = Str ;   -- relative pronoun,         e.g. "that"
+		IP = Pronoun ;   -- interrogative pronoun,    e.g. "who"
+		Subj = Str ; -- subjunction,              e.g. "because"
+		VS = V ;   -- sentence-complement verb, e.g. "know"
+		VQ = V ;   -- question-complement verb, e.g. "wonder"
+		VV = V ;   -- VP-complement verb,       e.g. "want"
+		VA = V ;   -- AP-complement verb,       e.g. "become"
+
+
+
+	oper complV2 : Verb2 -> VerbPhrase = \v2 -> {
+		verb = verb2gverb v2 ;
+		compl = ""
+		} ;
 
 lin
 
-  SlashV2 np v2 = {n = np ; v = v2 };
+  SlashV2 np v2 = mkCl np (complV2 v2) ;
+
+	QuestSlash ip clslash = {
+		subj = ip.s ! Acc ++ clslash.subj ;
+		compl = clslash.compl ;
+		verb = clslash.verb
+	};
+
+		--verb = \\plain,isPres => case <vp.verb.isAux, plain, isPres, np.a> of {
+	--QuestSlash ip clslash = "" ;
+  --SlashV2 np v2 = {n = np ; v = v2 };
+	--maybe just do a predvp with an empty object
   --SlashV2 np v2 = {s = np.s ! Nom ++ v2.s !  ; 
   --Verb : Type = {s : VForm => Str} ;
   --Verb2 : Type = Verb ** {c : Str} ;
@@ -29,12 +45,12 @@ lin
   --so the slashV2 fcn needs to more or less resemble a clause except it doesn't need righthand side
   --need a function that takes an ip to an np
 
-	who_IP  = mkPron "who" "whom" "" (Agr Sg Per3) ;
+	who_IP  = mkPron "who" "whom" "whose" (Agr Sg Per3) ;
 	what_IP  = mkPron "what" "what" "" (Agr Sg Per3) ;
 
 	QuestVP ip vp = let npip = prToNP ip in ( mkCl npip vp) ;
 
-    --UsePron p = {s = p.s ; a = p.a } ;  -- Pron is worst-case NP  
+	--UsePron p = {s = p.s ; a = p.a } ;  -- Pron is worst-case NP  
 
 
 --  oper UsePr

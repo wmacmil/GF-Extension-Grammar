@@ -64,6 +64,10 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     Prep = {s : Str} ;
     V = Verb ;
     V2 = Verb2 ;
+    oper mkCl np vp = {
+      subj = np.s ! Nom ;
+      compl = vp.compl ;
+      verb = \\plain,isPres => case <vp.verb.isAux, plain, isPres, np.a> of {
     A = Adjective ;
     N = Noun ;
     PN = {s : Str} ;
@@ -105,6 +109,7 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
 --    PredVP np vp = {
 --      subj = np.s ! Nom ;
 --      compl = vp.compl ;
+--<isAux : Bool true only when be_Gverb otherwise False  ,input  Always false in questions but regulated by polarity otherwise  , Tense, agreement>
 --      verb = \\plain,isPres => case <vp.verb.isAux, plain, isPres, np.a> of {
 --
 --        -- non-auxiliary verbs, negative/question present: "does (not) drink" 

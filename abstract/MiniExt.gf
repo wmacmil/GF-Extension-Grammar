@@ -27,6 +27,8 @@ fun
 
   UseRCl    : Temp -> Pol -> RCl -> RS ;
   RelVP     : RP -> VP -> RCl ;       -- that sees me
+  --the girl that sees me
+  --the girls that see me
   RelSlash  : RP -> ClSlash -> RCl ;  -- that I see
   
   ComplVS   : VS -> S  -> VP ;  -- know that she sees me
