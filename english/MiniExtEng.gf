@@ -17,7 +17,8 @@ concrete MiniExtEng of MiniExt = MiniLangEng ** open MiniResEng, Prelude in {
 
 	oper complV2 : Verb2 -> VerbPhrase = \v2 -> {
 		verb = verb2gverb v2 ;
-		compl = ""
+		compl = "";
+		isRefl = False
 		} ;
 
 lin
@@ -110,6 +111,14 @@ lin
   although_Subj = mkSubj "although" ;
 
 	oper mkSubj : Str -> {s : Str} = \str -> {s = str};
+
+lin
+
+	ReflV2 v2 = {
+		verb = verb2gverb v2 ;
+		compl = ""; 
+		isRefl = True
+		} ;
 
 
   ----------------

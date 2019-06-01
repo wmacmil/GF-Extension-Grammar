@@ -14,7 +14,25 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     --NP = {s : Case => Str ; a : Agreement} ;
     oper NounPhrase : Type = {s : Case => Str ; a : Agreement ; isIR : Bool } ;
     --VP = {verb : GVerb ; compl : Str} ;
-    oper VerbPhrase : Type = {verb : GVerb ; compl : Str} ;
+    oper VerbPhrase : Type = {verb : GVerb ; compl : Str ; isRefl : Bool} ;
+
+  --Number = Sg | Pl ;
+  --Person = Per1 | Per2 | Per3 ;
+  --Agreement = Agr Number Person ;
+
+
+	oper 
+		reflPron : Agreement => Str = table {
+			Agr Sg Per1 => "myself" ;
+			Agr Sg Per2     => "yourself" ;
+			--AgP3Sg Masc  => "himself" ;
+			--AgP3Sg Fem   => "herself" ;
+			Agr Sg Per3 => "itself" ;
+			Agr Pl Per1     => "ourselves" ;
+			Agr Pl Per2     => "yourselves" ;
+			Agr _  _   => "themselves"
+			} ;
+
 
 --<isAux : Bool true only when be_Gverb otherwise False  ,input  Always false in questions but regulated by polarity otherwise  , Tense, agreement>
 --the nom or Acc will ultimately determine whether who or whom gets used
@@ -26,7 +44,10 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
       subj = np.s ! Nom ;
       isIR = np.isIR ;
       cs = Nom ;
-      compl = vp.compl ;
+      compl = case vp.isRefl of { 
+				False => vp.compl; 
+				True => reflPron ! np.a };
+      --compl = vp.compl ;
       verb = \\plain,isPres => case <vp.verb.isAux, plain, isPres, np.a> of {
 
         -- non-auxiliary verbs, negative/question present: "does (not) drink" 
@@ -183,30 +204,30 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     UseV v = {
       verb = verb2gverb v ;  -- lift ordinary verbs to generalized verbs
       compl = []
-      } ;
+      } ** { isRefl = False } ;
       
     ComplV2 v2 np = {
       verb = verb2gverb v2 ;
       compl = v2.c ++ np.s ! Acc  -- NP object in the accusative, preposition first
-      } ;
+      } ** { isRefl = False } ;
       
     UseAP ap = {
       verb = be_GVerb ;     -- the verb is the copula "be"
       compl = ap.s
-      } ;
+      } ** { isRefl = False } ;
       
     UseNP np = {
       verb = be_GVerb ;
       compl = np.s ! Nom    -- NP complement is in the nominative
-      } ;
+      } ** { isRefl = False } ;
       
     UseAdv adv = {
       verb = be_GVerb ;
       compl = adv.s
-      } ;
+      }  ** { isRefl = False } ;
 
     AdvVP vp adv =
-      vp ** {compl = vp.compl ++ adv.s} ;
+      vp ** {compl = vp.compl ++ adv.s} ** {isRefl = vp.isRefl} ;
       
     DetCN det cn = {
       s = table {c => det.s ++ cn.s ! det.n} ;
