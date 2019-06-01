@@ -130,18 +130,18 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     UttAdv adv = adv ;
     UttImpSg pol imp = {s = pol.s ++ imp.s ! pol.isTrue} ;
 
-    --UseCl temp pol cl = normOrder temp pol cl ;
+    UseCl temp pol cl = normOrder temp pol cl ;
 
-    UseCl temp pol cl =
-      let clt = cl.verb ! pol.isTrue ! temp.isPres  -- isTrue regulates if "do" is used
-      in {
-        s = pol.s ++ temp.s ++    --- needed for parsing: a hack
-	    cl.subj ++               -- she
-	    clt.fin ++               -- does
-	    negation pol.isTrue ++   -- not
-	    clt.inf ++               -- drink
-	    cl.compl                 -- beer
-      } ;
+    --UseCl temp pol cl =
+    --  let clt = cl.verb ! pol.isTrue ! temp.isPres  -- isTrue regulates if "do" is used
+    --  in {
+    --    s = pol.s ++ temp.s ++    --- needed for parsing: a hack
+	  --  cl.subj ++               -- she
+	  --  clt.fin ++               -- does
+	  --  negation pol.isTrue ++   -- not
+	  --  clt.inf ++               -- drink
+	  --  cl.compl                 -- beer
+    --  } ;
 
     --UseQCl temp pol cl = revOrder temp pol cl ;
 

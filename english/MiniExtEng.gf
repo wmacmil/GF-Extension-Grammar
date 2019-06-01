@@ -4,9 +4,7 @@ concrete MiniExtEng of MiniExt = MiniLangEng ** open MiniResEng, Prelude in {
 	lincat
 
 		ClSlash = Clause ;
-		--ClSlash = {n : NounPhrase ; v : Verb2 }; -- slash clause,          e.g. "(that) I see"
-		--ClSlash = {n : NounPhrase ; v : V2 }; -- slash clause,          e.g. "(that) I see"
-		IAdv = Str ; -- interrogative adverbial,  e.g. "where"
+		IAdv = {s : Str} ; -- interrogative adverbial,  e.g. "where"
 		RS = Str ;   -- relative clause with fixed tense and polarity, e.g. "that I have not seen"
 		RCl = Str ;  -- relative clause,          e.g. "that I see"
 		RP = Str ;   -- relative pronoun,         e.g. "that"
@@ -26,12 +24,6 @@ lin
 
   SlashV2 np v2 = mkCl np (complV2 v2) ;
 
-    --  ip = "";
-    --  subj = np.s ! Nom ;
-    --  isIR = np.isIR ;
-    --  ag = np.a;
-    --  compl = vp.compl ;
-
 	QuestSlash ipN clslash = {
 		ip = clslash.ip ++ ipN.s ! Acc ;
 		subj = clslash.subj ;
@@ -46,23 +38,17 @@ lin
 
 	QuestVP ip vp = let npip = prToNP ip in ( mkCl npip vp) ;
 
+	QuestIAdv iadv cl = {
+		ip = cl.ip ++ iadv.s ;
+		subj = cl.subj ;
+		isIR = True ;
+		cs = Acc ;
+		compl = cl.compl ;
+		verb = cl.verb
+	};
 
-	--subj = ip.s ! Acc ++ clslash.subj ;
-  --I love that the man with the dog sees himself.
-  --so the slashV2 fcn needs to more or less resemble a clause except it doesn't need righthand side
-  --need a function that takes an ip to an np
-	--maybe the fin should just be empty in the case of a who what or that
-	--UsePron p = {s = p.s ; a = p.a } ;  -- Pron is worst-case NP  
-
-
---
---	QuestVP ip vp = "" ;
---	QuestSlash ip clslash = "" ;
---	QuestIAdv iadv cl = "" ;
---
---
---  where_IAdv = "";
---  why_IAdv   = "";
+  where_IAdv = {s = "where"} ; 
+  why_IAdv   = {s = "why"} ;
 
   ----------------
 
