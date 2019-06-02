@@ -1,5 +1,5 @@
 --# -path=.:../abstract
-concrete MiniExtEng of MiniExt = MiniLangEng ** open MiniResEng, Prelude in {
+concrete MiniExtEng of MiniExt = MiniLangEng ** open MiniResEng, Prelude, MiniParadigmsEng in {
 
 	lincat
 
@@ -10,10 +10,10 @@ concrete MiniExtEng of MiniExt = MiniLangEng ** open MiniResEng, Prelude in {
 		RP = Pronoun ;   -- relative pronoun,         e.g. "that"
 		IP = Pronoun ;   -- interrogative pronoun,    e.g. "who"
 		Subj = {s : Str} ; -- subjunction,              e.g. "because"
-		VS = V ;   -- sentence-complement verb, e.g. "know"
-		VQ = V ;   -- question-complement verb, e.g. "wonder"
+		VS = Verb2 ;   -- sentence-complement verb, e.g. "know"
+		VQ = Verb2 ;   -- question-complement verb, e.g. "wonder"
 		VV = V ;   -- VP-complement verb,       e.g. "want"
-		VA = V ;   -- AP-complement verb,       e.g. "become"
+		VA = Verb2 ;   -- AP-complement verb,       e.g. "become"
 
 	oper complV2 : Verb2 -> VerbPhrase = \v2 -> {
 		verb = verb2gverb v2 ;
@@ -93,8 +93,6 @@ lin
 
   that_RP = mkPron "that" "that" "" (Agr Sg Per3) True ;
 
-
-
 	--RelCN cn rs = {s = table { Sg => cn.s ! Sg ++ rs.s;
 --														 Pl => cn.s ! Pl ++ rs.s } } ;
 	--RelCN cn rs = {s = table { x => cn.s ! x ++ rs.s } } ;
@@ -123,9 +121,6 @@ lin
 	PossSgDet pn = {s = pn.p ; n = Sg } ;
 	PossPlDet pn = {s = pn.p ; n = Pl } ;
 
-
-  --param TempParam = SN | AN | PS | PA | CS | CA ;
-
   TPastSim = {s = []    ; tense = PS} ;
   TPastAnt = {s = []    ; tense = PA} ;
   TCondSim = {s = []    ; tense = CS} ;
@@ -133,23 +128,33 @@ lin
 
   ----------------
 
---https://stackoverflow.com/questions/1676632/whats-a-quick-way-to-comment-uncomment-lines-in-vim
---  
---	ComplVS vs s = "" ;   
---	ComplVQ vs s = "" ;   
+--lin drink_V2 = mkV2 (mkV "drink" "drank" "drunk") ;
+
+  know_VS = mkV2 (mkV "know" "knew" "known") ;
+
+	ComplVS vs s = {
+      verb = verb2gverb vs ;  
+      compl = s.s
+      } ** { isRefl = False } ;
+
+  become_VA = mkV2 (mkV "become" "became" "become") ;
+
+	ComplVA va ap = {
+      verb = verb2gverb va ;  
+      compl = ap.s
+      } ** { isRefl = False } ;
+
+  wonder_VQ = mkV2 (mkV "wonder") ;
+
+	ComplVQ vq temp pol qcl = let q = evalQCl temp pol qcl in {
+      verb = verb2gverb vq ;  
+      compl = q.s
+      } ** { isRefl = False } ;
+
+
 --	ComplVV vv vp = "" ;   
---	ComplVA va ap = "" ;   
---
----- more tenses
---  TPastSim = "";
---  TPastAnt = "";
---  TCondSim = "";
---  TCondAnt = "";
---
 ---- Structural words
 ---- content words to test with
---  know_VS   = "";
---  wonder_VQ = "";
 --  want_VV   = (mkV "want") ** { c = ToInf } ;
 --  want_VV   = (mkV "want") ** { c = ToInf } ;
 --    VForm = VF Number Person | VIng | VInf ; -- Present tense forms, participle and infinitive
@@ -160,6 +165,5 @@ lin
 --    --VP = { s : VForm => Str ; adv : Str ; compl : Str } ;
 --  must_VV   = "";
 --  try_VV    = "";
---  become_VA = "";
 
 }

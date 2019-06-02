@@ -32,7 +32,7 @@ fun
   RelSlash  : RP -> ClSlash -> RCl ;  -- that I see
   
   ComplVS   : VS -> S  -> VP ;  -- know that she sees me
-  ComplVQ   : VQ -> QCl -> VP ;  -- wonder whom I see
+  ComplVQ   : VQ -> Temp -> Pol -> QCl -> VP ; -- wonder whom I see wondered whom I saw
   ComplVV   : VV -> VP -> VP ;  -- want to sleep
   ComplVA   : VA -> AP -> VP ;  -- become red
   ReflV2    : V2 -> VP ;        -- see himself
@@ -46,6 +46,7 @@ fun
 
 -- more tenses
   TPastSim : Temp ; -- (slept)
+  -- he did not sleep
   TPastAnt : Temp ; -- had (slept)
   TCondSim : Temp ; -- would (sleep)
   TCondAnt : Temp ; -- would have (slept)

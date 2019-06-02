@@ -56,20 +56,26 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
         <_,_, SN, _>           => {fin = vp.verb.s ! PresPl     ; inf = []} ;
         <_,_, AN,Agr Sg Per3> => {fin = "has"  ; inf = vp.verb.s ! VF PastPart} ;
         <_,_, AN,_          > => {fin = "have" ; inf = vp.verb.s ! VF PastPart} ;
+
+--also a confound with the auxiliary
+        <False,False, PS,_       > => {fin = "did" ; inf = vp.verb.s ! PresSg1 } ;
+        --the bad waters was not now....were vs was
+        --<_,False, PS,_       > => {fin = "did" ; inf = vp.verb.s ! PresSg1 } ;
         <_,_, PS,_         > => {fin = vp.verb.s ! VF Past ; inf = []} ;
         <_,_, PA,_         > => {fin = "had" ; inf = vp.verb.s ! VF PastPart} ;
         <_,_, CS,_         > => {fin = "would" ; inf = vp.verb.s ! PresSg1} ;
 
-        --case for the negative
+        <_,True, CA,_         > => {fin = "would" ; inf = "have" ++ vp.verb.s ! VF PastPart} ;
+        <_,_, CA,_         > => {fin = "would have" ; inf = vp.verb.s ! VF PastPart} 
+        --<_,True, CA,_         > => {fin = "would" ; inf = "have" ++ vp.verb.s ! VF PastPart} ;
         --<_,_, CA,_         > => {fin = "would have" ; inf = vp.verb.s ! VF PastPart} 
-        <_,_, CA,_         > => {fin = "would" ; inf = "have" ++ vp.verb.s ! VF PastPart} 
       }
     } ;
 
         --<_,_, PS,_         > => {fin = "vp.verb.s ! VF PastPart" ; inf = []} ;
         --<_,_, PS,_       > => {fin = "" ; inf = vp.verb.s ! VF PastPart} ;
 
-
+--who bought not itself
 ---- more tenses
 --  TPastSim : Temp ; -- (slept) drank pres= broke
 --	VF Past
@@ -196,13 +202,25 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     --  True => normOrder temp pol cl 
     --};
 
-    UseQCl temp pol cl = case cl.isIR of {
+  oper evalQCl : Temporality -> Polarity -> Clause -> {s : Str};
+  oper evalQCl temp pol cl = case cl.isIR of {
       True => case cl.cs of {
         Nom => normOrderWho temp pol cl ;
         Acc => revOrder temp pol cl 
         };
       False => revOrder temp pol cl 
     };
+
+  lin 
+    UseQCl temp pol cl = evalQCl temp pol cl ;
+
+   -- UseQCl temp pol cl = case cl.isIR of {
+   --   True => case cl.cs of {
+   --     Nom => normOrderWho temp pol cl ;
+   --     Acc => revOrder temp pol cl 
+   --     };
+   --   False => revOrder temp pol cl 
+   -- };
 
    -- UseQCl temp pol cl =
    --   let clt = cl.verb ! False ! temp.tense      -- False means that "do" is always used
