@@ -7,7 +7,8 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
       subj : Str ;                             -- subject
       isIR : Bool ;
       cs : Case ;
-      verb : Bool => Bool => {fin,inf : Str} ; -- dep. on Pol,Temp, e.g. "does","sleep"
+      --verb : Bool => Bool => {fin,inf : Str} ; -- dep. on Pol,Temp, e.g. "does","sleep"
+      verb : Bool => TempParam => {fin,inf : Str} ; -- dep. on Pol,Temp, e.g. "does","sleep"
       compl : Str                              -- after verb: complement, adverbs
       } ;
 
@@ -47,27 +48,58 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
       compl = case vp.isRefl of { 
 				False => vp.compl; 
 				True => reflPron ! np.a };
-      --compl = vp.compl ;
-      verb = \\plain,isPres => case <vp.verb.isAux, plain, isPres, np.a> of {
+      verb = \\plain,tense => case <vp.verb.isAux, plain, tense, np.a> of {
+        <False,False,SN,Agr Sg Per3> => {fin = "does" ; inf = vp.verb.s ! VF Inf} ;
+        <False,False,SN,_          > => {fin = "do"   ; inf = vp.verb.s ! VF Inf} ;
+        <_,_, SN, Agr Sg Per1> => {fin = vp.verb.s ! PresSg1    ; inf = []} ;
+        <_,_, SN, Agr Sg Per3> => {fin = vp.verb.s ! VF PresSg3 ; inf = []} ;
+        <_,_, SN, _>           => {fin = vp.verb.s ! PresPl     ; inf = []} ;
+        <_,_, AN,Agr Sg Per3> => {fin = "has"  ; inf = vp.verb.s ! VF PastPart} ;
+        <_,_, AN,_          > => {fin = "have" ; inf = vp.verb.s ! VF PastPart} ;
+        <_,_, PS,_         > => {fin = vp.verb.s ! VF Past ; inf = []} ;
+        <_,_, PA,_         > => {fin = "had" ; inf = vp.verb.s ! VF PastPart} ;
+        <_,_, CS,_         > => {fin = "would" ; inf = vp.verb.s ! PresSg1} ;
 
-        -- non-auxiliary verbs, negative/question present: "does (not) drink" 
-        <False,False,True,Agr Sg Per3> => {fin = "does" ; inf = vp.verb.s ! VF Inf} ;
-        <False,False,True,_          > => {fin = "do"   ; inf = vp.verb.s ! VF Inf} ;
-	
-        -- non-auxiliary, plain present ; auxiliary, all present: "drinks", "is (not)"
-        <_,_, True, Agr Sg Per1> => {fin = vp.verb.s ! PresSg1    ; inf = []} ;
-        <_,_, True, Agr Sg Per3> => {fin = vp.verb.s ! VF PresSg3 ; inf = []} ;
-        <_,_, True, _>           => {fin = vp.verb.s ! PresPl     ; inf = []} ;
-
-        -- all verbs, past: "has (not) drunk", "has (not) been"
-        <_,_, False,Agr Sg Per3> => {fin = "has"  ; inf = vp.verb.s ! VF PastPart} ;
-        <_,_, False,_          > => {fin = "have" ; inf = vp.verb.s ! VF PastPart} 
-
-        -- the negation word "not" is put in place in UseCl, UseQCl
+        --case for the negative
+        --<_,_, CA,_         > => {fin = "would have" ; inf = vp.verb.s ! VF PastPart} 
+        <_,_, CA,_         > => {fin = "would" ; inf = "have" ++ vp.verb.s ! VF PastPart} 
       }
     } ;
 
-  oper Temporality : Type = {s : Str ; isPres : Bool} ;
+        --<_,_, PS,_         > => {fin = "vp.verb.s ! VF PastPart" ; inf = []} ;
+        --<_,_, PS,_       > => {fin = "" ; inf = vp.verb.s ! VF PastPart} ;
+
+
+---- more tenses
+--  TPastSim : Temp ; -- (slept) drank pres= broke
+--	VF Past
+	----  TPastAnt : Temp ; -- had (slept) drunk /broken
+	--	VF PastPart == broken
+	----  TCondSim : Temp ; -- would (sleep) drink break
+	--	PressSg1
+	--  TCondAnt : Temp ; -- would have (slept) would have broken
+	--	VF PastPart
+--mkV : (inf,pres,part : Str) -> V  -- irregular verb, e.g. drink-drank-drunk
+--      = \inf,pres,part -> lin V (irregVerb inf pres part) ;
+--  VForm = Inf | PresSg3 | Past | PastPart | PresPart ; 
+--   GVForm = VF VForm | PresSg1 | PresPl | PastPl ;
+--      Inf => inf ;
+--      PresSg3 => pres ;
+--      Past => past ;
+--      PastPart => pastpart ;
+--      PresPart => prespart
+   -- table {
+   --   VPresent Sg => "drinks" ;
+   --   VPresent Pl => "drink" ;
+   --   VPast       => "drank" ;
+   --   VPastPart   => "drunk" ;
+    --  VPresPart   => "drinking"
+    --  }
+
+	param TempParam = SN | AN | PS | PA | CS | CA ;
+
+	--Temp = {s : Str ; tense : TempParam} ;
+  oper Temporality : Type = {s : Str ; tense : TempParam} ;
   oper Polarity : Type = {s : Str ; isTrue : Bool} ;
 
    -- QuestVP    : IP -> VP -> QCl ;      -- who sees me
@@ -76,7 +108,7 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
 
 --use this for whom cases
   oper revOrder : Temporality -> Polarity -> Clause -> {s : Str} ;
-  oper revOrder temp pol cl = let clt = cl.verb ! False ! temp.isPres      -- False means that "do" is always used
+  oper revOrder temp pol cl = let clt = cl.verb ! False ! temp.tense      -- False means that "do" is always used
         in {
           s = pol.s ++ temp.s ++
         cl.ip ++  --whom
@@ -87,9 +119,9 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
         cl.compl                 -- beer
         } ;
 
-  --oper normOrderWho temp pol cl = let clt = cl.verb ! False ! temp.isPres      -- False means that "do" is always used, changed false to true
+  --oper normOrderWho temp pol cl = let clt = cl.verb ! False ! temp.tense      -- False means that "do" is always used, changed false to true
   oper normOrderWho : Temporality -> Polarity -> Clause -> {s : Str} ;
-  oper normOrderWho temp pol cl = let clt = cl.verb ! True ! temp.isPres      -- False means that "do" is always used
+  oper normOrderWho temp pol cl = let clt = cl.verb ! True ! temp.tense      -- False means that "do" is always used
         in {
           s = pol.s ++ temp.s ++
         cl.subj ++               -- she
@@ -101,7 +133,7 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
 
 --only use this for normal questions
   oper normOrder : Temporality -> Polarity -> Clause -> {s : Str} ;
-  oper normOrder temp pol cl = let clt = cl.verb ! pol.isTrue ! temp.isPres      -- False means that "do" is always used
+  oper normOrder temp pol cl = let clt = cl.verb ! pol.isTrue ! temp.tense      -- False means that "do" is always used
         in {
           s = pol.s ++ temp.s ++
         cl.subj ++               -- she
@@ -115,16 +147,9 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     Utt = {s : Str} ;
     Pol = Polarity ;
     Temp = Temporality ;
-    --Pol  = {s : Str ; isTrue : Bool} ; -- the s field is empty, but needed for parsing
-    --Temp = {s : Str ; isPres : Bool} ;
     S  = {s : Str} ;
     QS = {s : Str} ;
     Cl, QCl = Clause ;
-   -- Cl, QCl = {   -- word order is fixed in S and QS
-   --   subj : Str ;                             -- subject
-   --   verb : Bool => Bool => {fin,inf : Str} ; -- dep. on Pol,Temp, e.g. "does","sleep"
-   --   compl : Str                              -- after verb: complement, adverbs
-   --   } ;
     Imp = {s : Bool => Str} ;
     VP = VerbPhrase;
     --VP = {verb : GVerb ; compl : Str} ;
@@ -154,7 +179,7 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     UseCl temp pol cl = normOrder temp pol cl ;
 
     --UseCl temp pol cl =
-    --  let clt = cl.verb ! pol.isTrue ! temp.isPres  -- isTrue regulates if "do" is used
+    --  let clt = cl.verb ! pol.isTrue ! temp.tense  -- isTrue regulates if "do" is used
     --  in {
     --    s = pol.s ++ temp.s ++    --- needed for parsing: a hack
 	  --  cl.subj ++               -- she
@@ -180,7 +205,7 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     };
 
    -- UseQCl temp pol cl =
-   --   let clt = cl.verb ! False ! temp.isPres      -- False means that "do" is always used
+   --   let clt = cl.verb ! False ! temp.tense      -- False means that "do" is always used
    --   in {
    --     s = pol.s ++ temp.s ++
 	 --   clt.fin ++               -- does
@@ -266,8 +291,8 @@ concrete MiniGrammarEng of MiniGrammar = open MiniResEng, Prelude in {
     PPos  = {s = [] ; isTrue = True} ;
     PNeg  = {s = [] ; isTrue = False} ;
 
-    TSim  = {s = []    ; isPres = True} ;
-    TAnt  = {s = []    ; isPres = False} ;
+    TSim  = {s = []    ; tense = SN} ;
+    TAnt  = {s = []    ; tense = AN} ;
 
     and_Conj = {s = "and"} ;
     or_Conj = {s = "or"} ;

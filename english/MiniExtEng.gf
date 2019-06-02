@@ -63,7 +63,7 @@ lin
 	};
 
   oper revOrderThat : Temporality -> Polarity -> Clause -> {s : Str} ;
-  oper revOrderThat temp pol cl = let clt = cl.verb ! pol.isTrue ! temp.isPres      -- False means that "do" is always used
+  oper revOrderThat temp pol cl = let clt = cl.verb ! pol.isTrue ! temp.tense      -- False means that "do" is always used
         in {
           s = pol.s ++ temp.s ++
         cl.ip ++  --whom
@@ -75,7 +75,7 @@ lin
         } ;
 
   oper normOrderThat : Temporality -> Polarity -> Clause -> {s : Str} ;
-  oper normOrderThat temp pol cl = let clt = cl.verb ! pol.isTrue ! temp.isPres      -- False means that "do" is always used
+  oper normOrderThat temp pol cl = let clt = cl.verb ! pol.isTrue ! temp.tense      -- False means that "do" is always used
         in {
           s = pol.s ++ temp.s ++
         cl.subj ++               -- that
@@ -119,7 +119,17 @@ lin
 		compl = ""; 
 		isRefl = True
 		} ;
+ 
+	PossSgDet pn = {s = pn.p ; n = Sg } ;
+	PossPlDet pn = {s = pn.p ; n = Pl } ;
 
+
+  --param TempParam = SN | AN | PS | PA | CS | CA ;
+
+  TPastSim = {s = []    ; tense = PS} ;
+  TPastAnt = {s = []    ; tense = PA} ;
+  TCondSim = {s = []    ; tense = CS} ;
+  TCondAnt = {s = []    ; tense = CA} ;
 
   ----------------
 
@@ -130,13 +140,6 @@ lin
 --	ComplVV vv vp = "" ;   
 --	ComplVA va ap = "" ;   
 --
---	ReflV2 v2 = "" ;   
---
---
---	PossSgDet pron = "" ;
---	PossPlDet pron = "" ;
---
---
 ---- more tenses
 --  TPastSim = "";
 --  TPastAnt = "";
@@ -144,9 +147,6 @@ lin
 --  TCondAnt = "";
 --
 ---- Structural words
---
---
---
 ---- content words to test with
 --  know_VS   = "";
 --  wonder_VQ = "";
